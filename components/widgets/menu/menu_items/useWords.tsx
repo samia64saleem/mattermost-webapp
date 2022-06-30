@@ -10,6 +10,7 @@ import {t} from 'utils/i18n';
 
 import useOpenPricingModal from 'components/common/hooks/useOpenPricingModal';
 import {LimitTypes, LimitSummary} from 'components/common/hooks/useGetHighestThresholdCloudLimit';
+import {useNotifyAdmin, NotifyStatus} from 'components/pricing_modal/notify_admin_cta';
 
 interface Words {
     title: React.ReactNode;
@@ -20,6 +21,10 @@ interface Words {
 export default function useWords(highestLimit: LimitSummary | false, isAdminUser: boolean): Words | false {
     const intl = useIntl();
     const openPricingModal = useOpenPricingModal();
+    const {notify, message} = useNotifyAdmin({[NotifyStatus.NotStarted]: {
+        id: t('workspace_limits.menu_limit.notify_admin'),
+        defaultMessage: 'Notify admin',
+    }});
     if (!highestLimit) {
         return false;
     }
@@ -28,6 +33,9 @@ export default function useWords(highestLimit: LimitSummary | false, isAdminUser
         id: 'workspace_limits.menu_limit.view_plans',
         defaultMessage: 'View plans',
     });
+    if (!isAdminUser && usageRatio >= limitThresholds.danger) {
+        callToAction = message;
+    }
     if (isAdminUser) {
         callToAction = intl.formatMessage({
             id: 'workspace_limits.menu_limit.view_upgrade_options',
@@ -39,7 +47,7 @@ export default function useWords(highestLimit: LimitSummary | false, isAdminUser
         callToAction,
         a: (chunks: React.ReactNode | React.ReactNodeArray) => (
             <a
-                onClick={openPricingModal}
+                onClick={(!isAdminUser && usageRatio >= limitThresholds.danger) ? notify : openPricingModal}
             >
                 {chunks}
             </a>

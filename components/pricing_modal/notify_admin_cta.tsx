@@ -7,6 +7,7 @@ import {useSelector} from 'react-redux';
 
 import {Client4} from 'mattermost-redux/client';
 import {getCurrentTeamId} from 'mattermost-redux/selectors/entities/teams';
+import {Message, t} from 'utils/i18n';
 
 const Span = styled.span`
 font-family: 'Open Sans';
@@ -22,7 +23,7 @@ background: none;
 color: var(--denim-button-bg);
 `;
 
-enum NotifyStatus {
+export enum NotifyStatus {
     NotStarted = 'NOT_STARTED',
     Started = 'STARTED',
     Success = 'SUCCESS',
@@ -30,21 +31,36 @@ enum NotifyStatus {
     AlreadyComplete = 'COMPLETE'
 }
 
-export enum DafaultBtnText {
-    NotifyAdmin = 'Notify your admin',
-    Notifying = 'Notifying...',
-    Notified = 'Notified!',
-    AlreadyNotified = 'Already notified!',
-    Failed = 'Try again later!',
-}
+const defaultTexts: Record<NotifyStatus, Message> = {
+    [NotifyStatus.NotStarted]: {
+        id: t('notify_admin_to_upgrade_cta.notify-admin.notify'),
+        defaultMessage: 'Notify your admin',
+    },
+    [NotifyStatus.Started]: {
+        id: t('notify_admin_to_upgrade_cta.notify-admin.notifying'),
+        defaultMessage: 'Notifying...',
+    },
+    [NotifyStatus.Success]: {
+        id: t('notify_admin_to_upgrade_cta.notify-admin.notified'),
+        defaultMessage: 'Notified!',
+    },
+    [NotifyStatus.AlreadyComplete]: {
+        id: t('notify_admin_to_upgrade_cta.notify-admin.already_notified'),
+        defaultMessage: 'Already notified!',
+    },
+    [NotifyStatus.Failed]: {
+        id: t('notify_admin_to_upgrade_cta.notify-admin.failed'),
+        defaultMessage: 'Try again later!',
+    },
+};
 
-function NotifyAdminCTA() {
-    const [notifyStatus, setStatus] = useState(NotifyStatus.NotStarted);
+export function useNotifyAdmin(alternateMappings?: Partial<Record<NotifyStatus, Message>>) {
+    const [status, setStatus] = useState(NotifyStatus.NotStarted);
     const {formatMessage} = useIntl();
 
     const currentTeam = useSelector(getCurrentTeamId);
 
-    const notifyFunc = async () => {
+    const notify = async () => {
         try {
             setStatus(NotifyStatus.Started);
             const req = {
@@ -61,29 +77,32 @@ function NotifyAdminCTA() {
         }
     };
 
-    const btnText = (status: NotifyStatus): string => {
-        switch (status) {
-        case NotifyStatus.Started:
-            return formatMessage({id: 'notify_admin_to_upgrade_cta.notify-admin.notifying', defaultMessage: DafaultBtnText.Notifying});
-        case NotifyStatus.Success:
-            return formatMessage({id: 'notify_admin_to_upgrade_cta.notify-admin.notified', defaultMessage: DafaultBtnText.Notified});
-        case NotifyStatus.AlreadyComplete:
-            return formatMessage({id: 'notify_admin_to_upgrade_cta.notify-admin.already_notified', defaultMessage: DafaultBtnText.AlreadyNotified});
-        case NotifyStatus.Failed:
-            return formatMessage({id: 'notify_admin_to_upgrade_cta.notify-admin.failed', defaultMessage: DafaultBtnText.Failed});
-        default:
-            return formatMessage({id: 'notify_admin_to_upgrade_cta.notify-admin.notify', defaultMessage: DafaultBtnText.NotifyAdmin});
-        }
+    let message = defaultTexts[status];
+    if (alternateMappings?.[status]) {
+        message = alternateMappings?.[status] as Message;
+    }
+    if (!message) {
+        message = defaultTexts[NotifyStatus.NotStarted];
+    }
+    return {
+        message: formatMessage(message),
+        notify,
+        status,
     };
+}
+
+function NotifyAdminCTA() {
+    const {notify, message} = useNotifyAdmin();
+    const {formatMessage} = useIntl();
 
     return (
         <div>
             <Span>{formatMessage({id: 'pricing_modal.wantToUpgrade', defaultMessage: 'Want to upgrade?'})}
                 <StyledBtn
                     id='notify_admin_cta'
-                    onClick={notifyFunc}
+                    onClick={notify}
                 >
-                    {btnText(notifyStatus)}
+                    {message}
                 </StyledBtn>
             </Span>
         </div>);

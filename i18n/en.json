@@ -5226,6 +5226,7 @@
   "workspace_limits.menu_limit.over.integrations_enabled": "You’ve reached the {limit} enabled integrations limit. You can’t enable additional integrations. Upgrade to remove this limit. <a>{callToAction}</a>",
   "workspace_limits.menu_limit.over.messages_history": "You’re over the free message history limit. You can only view up to the last {limit} messages in your history. <a>{callToAction}</a>",
   "workspace_limits.menu_limit.view_plans": "View plans",
+  "workspace_limits.menu_limit.notify_admin": "Notify admin",
   "workspace_limits.menu_limit.view_upgrade_options": "View upgrade options.",
   "workspace_limits.menu_limit.warn.boards_cards": "You’re getting closer to the {limit} board card limit. <a>{callToAction}</a>",
   "workspace_limits.menu_limit.warn.files_storage": "You’re getting closer to the {limit} file storage limit. <a>{callToAction}</a>",
