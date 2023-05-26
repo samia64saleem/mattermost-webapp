@@ -59,6 +59,16 @@ describe('components/global/CloudTrialEndAnnouncementBar', () => {
                         sku: CloudProducts.STARTER,
                         price_per_seat: 0,
                     },
+                    test_prod_2: {
+                        id: 'test_prod_2',
+                        sku: CloudProducts.ENTERPRISE,
+                        price_per_seat: 0,
+                    },
+                    test_prod_3: {
+                        id: 'test_prod_3',
+                        sku: CloudProducts.PROFESSIONAL,
+                        price_per_seat: 0,
+                    },
                 },
                 limits: {
                     limitsLoaded: true,
@@ -70,7 +80,7 @@ describe('components/global/CloudTrialEndAnnouncementBar', () => {
                             history: 10000,
                         },
                         files: {
-                            total_storage: 10 * FileSizes.Gigabyte,
+                            total_storage: FileSizes.Gigabyte,
                         },
                         teams: {
                             active: 1,
@@ -92,7 +102,7 @@ describe('components/global/CloudTrialEndAnnouncementBar', () => {
                     historyLoaded: true,
                 },
                 files: {
-                    totalStorage: 10 * FileSizes.Gigabyte,
+                    totalStorage: FileSizes.Gigabyte,
                     totalStorageLoaded: true,
                 },
                 teams: {
@@ -189,7 +199,7 @@ describe('components/global/CloudTrialEndAnnouncementBar', () => {
                         history: 10000,
                     },
                     files: {
-                        total_storage: 10 * FileSizes.Gigabyte,
+                        total_storage: FileSizes.Gigabyte,
                     },
                     teams: {
                         active: 1,
@@ -210,7 +220,7 @@ describe('components/global/CloudTrialEndAnnouncementBar', () => {
                     historyLoaded: true,
                 },
                 files: {
-                    totalStorage: 10 * FileSizes.Gigabyte,
+                    totalStorage: FileSizes.Gigabyte,
                     totalStorageLoaded: true,
                 },
                 teams: {
@@ -259,6 +269,34 @@ describe('components/global/CloudTrialEndAnnouncementBar', () => {
         expect(
             wrapper.find('AnnouncementBar').exists(),
         ).toEqual(false);
+    });
+
+    it('should not show for enterprise workspaces', () => {
+        const state = JSON.parse(JSON.stringify(initialState));
+        state.entities.cloud.subscription.product_id = 'test_prod_2';
+
+        const store = mockStore(state);
+        const wrapper = mountWithIntl(
+            <reactRedux.Provider store={store}>
+                <CloudTrialEndAnnouncementBar/>
+            </reactRedux.Provider>,
+        );
+
+        expect(wrapper.find('AnnouncementBar').exists()).toEqual(false);
+    });
+
+    it('should not show for professional workspaces', () => {
+        const state = JSON.parse(JSON.stringify(initialState));
+        state.entities.cloud.subscription.product_id = 'test_prod_3';
+
+        const store = mockStore(state);
+        const wrapper = mountWithIntl(
+            <reactRedux.Provider store={store}>
+                <CloudTrialEndAnnouncementBar/>
+            </reactRedux.Provider>,
+        );
+
+        expect(wrapper.find('AnnouncementBar').exists()).toEqual(false);
     });
 
     it('Should not show banner if preference is set to hidden', () => {

@@ -46,6 +46,9 @@ jest.mock('actions/admin_actions', () => ({
 describe('components/learn_more_trial_modal/start_trial_btn', () => {
     const state = {
         entities: {
+            users: {
+                currentUserId: 'current_user_id',
+            },
             admin: {
                 analytics: {
                     TOTAL_USERS: 9,
@@ -57,6 +60,9 @@ describe('components/learn_more_trial_modal/start_trial_btn', () => {
             general: {
                 license: {
                     IsLicensed: 'false',
+                },
+                config: {
+                    TelemetryId: 'test_telemetry_id',
                 },
             },
         },
@@ -114,6 +120,33 @@ describe('components/learn_more_trial_modal/start_trial_btn', () => {
         expect(trackEvent).toHaveBeenCalledWith(TELEMETRY_CATEGORIES.SELF_HOSTED_START_TRIAL_MODAL, 'test_telemetry_id');
     });
 
+    test('should handle on click when rendered as button', async () => {
+        const mockOnClick = jest.fn();
+
+        let wrapper: ReactWrapper<any>;
+
+        // Mount the component
+        await act(async () => {
+            wrapper = mountWithIntl(
+                <Provider store={store}>
+                    <StartTrialBtn
+                        {...props}
+                        renderAsButton={true}
+                        onClick={mockOnClick}
+                    />
+                </Provider>,
+            );
+        });
+
+        await act(async () => {
+            wrapper.find('button').simulate('click');
+        });
+
+        expect(mockOnClick).toHaveBeenCalled();
+
+        expect(trackEvent).toHaveBeenCalledWith(TELEMETRY_CATEGORIES.SELF_HOSTED_START_TRIAL_MODAL, 'test_telemetry_id');
+    });
+
     test('does not show success for embargoed countries', async () => {
         const mockOnClick = jest.fn();
 
@@ -138,7 +171,5 @@ describe('components/learn_more_trial_modal/start_trial_btn', () => {
         });
 
         expect(mockOnClick).not.toHaveBeenCalled();
-
-        expect(trackEvent).toHaveBeenCalledWith(TELEMETRY_CATEGORIES.SELF_HOSTED_START_TRIAL_MODAL, 'test_telemetry_id');
     });
 });

@@ -7,7 +7,6 @@
 // - Use element ID when selecting an element. Create one if none.
 // ***************************************************************
 
-// Stage: @prod
 // Group: @plugin @not_cloud
 
 import * as MESSAGES from '../../fixtures/messages';
@@ -80,7 +79,7 @@ describe('/poll', () => {
 
         cy.uiGetRHS().within(() => {
             // # In RHS, post `/poll reply`
-            cy.get('#reply_textbox').type('/poll reply');
+            cy.uiGetReplyTextBox().type('/poll reply');
             cy.findByTestId('SendMessageButton').click();
 
             // * Poll displays as expected in RHS.

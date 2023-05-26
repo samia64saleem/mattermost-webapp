@@ -52,7 +52,7 @@ describe('Verify Accessibility keyboard usability across different regions in th
         postMessages(testChannel, otherUser, count);
 
         // # Search for a term
-        cy.get('#searchBox').type('hello').type('{enter}', {force: true});
+        cy.get('#searchBox').typeWithForce('hello').typeWithForce('{enter}');
 
         // # Change the focus to search results
         cy.get('#searchContainer').within(() => {
@@ -103,7 +103,7 @@ describe('Verify Accessibility keyboard usability across different regions in th
 
         // # Change the focus to the last post
         cy.get('#rhsContainer').within(() => {
-            cy.get('#toggleFormattingBarButton').focus().tab({shift: true}).tab({shift: true}).tab({shift: true});
+            cy.uiGetReplyTextBox().focus().tab({shift: true});
         });
         cy.get('body').type('{uparrow}{downarrow}');
 
